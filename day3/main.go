@@ -3,9 +3,15 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 )
+
+type Houses struct {
+	sync.Mutex
+	Visited map[[2]int]bool
+}
 
 func main() {
 	log.SetLevel(log.ErrorLevel)
@@ -15,15 +21,33 @@ func main() {
 		log.Fatalf("Couldn't read file %s", err)
 	}
 
-	// we've seen the first point
+	houses := &Houses{
+		Visited: make(map[[2]int]bool),
+	}
+	santa := make(chan string)
+	roboSanta := make(chan string)
+
+	go deliverPresents(santa, houses)
+	go deliverPresents(roboSanta, houses)
+
+	for i, d := range data {
+		if i%2 == 0 {
+			santa <- string(d)
+		} else {
+			roboSanta <- string(d)
+		}
+	}
+	close(santa)
+	close(roboSanta)
+
+	fmt.Printf("Total houses visited: %d\n", len(houses.Visited))
+}
+
+func deliverPresents(direction <-chan string, h *Houses) {
 	point := [2]int{0, 0}
-	seen := make(map[[2]int]bool)
-	seen[point] = true
 
-	for _, d := range data {
+	for d := range direction {
 		p := [2]int{}
-		d := string(d)
-
 		switch d {
 		case ">":
 			log.Debugf("Got %s, going east", d)
@@ -39,14 +63,13 @@ func main() {
 			p[0], p[1] = point[0], point[1]-1
 		}
 
-		if seen[p] == true {
-			log.Warnf("%v == %v, we've been to this house before.", p, seen[p])
+		if h.Visited[p] == true {
+			log.Warnf("%v == %v, we've been to this house before.", p, h.Visited[p])
 		}
-		seen[p] = true
 
-		log.Debugf("We've been to %v houses", len(seen))
+		h.Lock()
+		h.Visited[p] = true
+		h.Unlock()
 		point = p
 	}
-
-	fmt.Printf("Visited %d houses\n", len(seen))
 }
