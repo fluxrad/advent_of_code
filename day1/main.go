@@ -13,8 +13,9 @@ func main() {
 	}
 
 	floor := 0
+	beenInBasement := false
 
-	for _, v := range data {
+	for i, v := range data {
 		switch v {
 		case '(':
 			floor++
@@ -24,6 +25,11 @@ func main() {
 			break
 		default:
 			fmt.Printf("Invalid character: %q, skipping\n", v)
+		}
+
+		if floor == -1 && beenInBasement == false {
+			fmt.Printf("Entered basement at position: %d\n", i+1)
+			beenInBasement = true
 		}
 	}
 	fmt.Println("Floor: ", floor)
