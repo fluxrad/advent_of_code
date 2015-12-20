@@ -5,48 +5,25 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
 
-/*
-Day 2
-
-The elves are running low on wrapping paper, and so they need to submit an
-order for more. They have a list of the dimensions (length l, width w, and
-height h) of each present, and only want to order exactly as much as they need.
-
-Fortunately, every present is a box (a perfect right rectangular prism), which
-makes calculating the required wrapping paper for each gift a little easier:
-find the surface area of the box, which is 2*l*w + 2*w*h + 2*h*l. The elves
-also need a little extra paper for each present: the area of the smallest side.
-*/
-
-func main() {
-	f, err := os.Open("./input")
-	if err != nil {
-		log.Fatalf("Couldn't open file %s", err)
-	}
-	defer f.Close()
-
-	totalWrappingPaper := 0
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		totalWrappingPaper += calculateWrappingPaper(scanner.Text())
-	}
-
-	fmt.Println("Total wrapping paper needed is ", totalWrappingPaper, " square feet")
+// Present is a Christmas present, lovingly crafted and wrapped by Santa's elves.
+type Present struct {
+	Length int
+	Width  int
+	Height int
 }
 
-// Accept LxWxH as a string
-func calculateWrappingPaper(s string) int {
-	lwh := strings.Split(s, "x")
-	l := measure(lwh[0])
-	w := measure(lwh[1])
-	h := measure(lwh[2])
-
-	surfaces := []int{l * w, w * h, h * l}
+// WrappingPaper returns the amount of wrapping paper necessary to wrap the Present
+func (p Present) WrappingPaper() int {
+	surfaces := []int{
+		p.Length * p.Width,
+		p.Width * p.Height,
+		p.Height * p.Length,
+	}
 
 	// Find the smallest surface for the extra
 	extra := surfaces[0]
@@ -59,10 +36,57 @@ func calculateWrappingPaper(s string) int {
 	return (2*(surfaces[0]+surfaces[1]+surfaces[2]) + extra)
 }
 
+// Ribbon returns the amount of ribbon necessary to make the present look
+// beautiful, including amount of material necessary for a bow
+func (p Present) Ribbon() int {
+	bow := p.Length * p.Width * p.Height
+
+	// find two short sides
+	sides := []int{p.Length, p.Width, p.Height}
+	sort.Ints(sides)
+
+	// 2x the two shortest sides, plus a bow)
+	return (2*(sides[0]+sides[1]) + bow)
+}
+
+// NewPresent returns a pointer to a new present from a string "LxWxH"
+func NewPresent(s string) *Present {
+	lwh := strings.Split(s, "x")
+
+	p := &Present{
+		Length: measure(lwh[0]),
+		Width:  measure(lwh[1]),
+		Height: measure(lwh[2]),
+	}
+
+	return p
+}
+
 func measure(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return i
+}
+
+func main() {
+	f, err := os.Open("./input")
+	if err != nil {
+		log.Fatalf("Couldn't open file %s", err)
+	}
+	defer f.Close()
+
+	totalWrappingPaper := 0
+	totalRibbon := 0
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		p := NewPresent(scanner.Text())
+		totalWrappingPaper += p.WrappingPaper()
+		totalRibbon += p.Ribbon()
+	}
+
+	fmt.Println("Total wrapping paper needed is ", totalWrappingPaper, " square feet")
+	fmt.Println("Total ribbon needed is ", totalRibbon, " feet")
 }
