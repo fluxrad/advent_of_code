@@ -14,7 +14,7 @@ import (
 var grid [][]int
 
 func init() {
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 }
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%x total light brightness\n", countBrightness(grid))
+	fmt.Printf("%d total light brightness\n", countBrightness(grid))
 }
 
 func playWithLights(i string) error {
@@ -55,6 +55,7 @@ func playWithLights(i string) error {
 		log.Fatal("Invalid instruction: %s", i)
 	}
 
+	// xy pairs
 	pairs := regexp.MustCompile("[0-9]+,[0-9]+").FindAllString(i, 2)
 	turnLights(oper, pairs[0], pairs[1])
 
@@ -78,7 +79,7 @@ func turnLights(oper string, start string, end string) {
 	case "on":
 		for x := startx; x <= endx; x++ {
 			for y := starty; y <= endy; y++ {
-				grid[x][y]--
+				grid[x][y]++
 				log.Debugf("%d,%d set to %d", x, y, grid[x][y])
 			}
 
