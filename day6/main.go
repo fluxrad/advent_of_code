@@ -11,16 +11,16 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-var grid [][]bool
+var grid [][]int
 
 func init() {
 	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
-	grid = make([][]bool, 1000)
+	grid = make([][]int, 1000)
 	for i := range grid {
-		grid[i] = make([]bool, 1000)
+		grid[i] = make([]int, 1000)
 	}
 
 	f, err := os.Open("./input")
@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%d lights are on\n", countLights(grid))
+	fmt.Printf("%x total light brightness\n", countBrightness(grid))
 }
 
 func playWithLights(i string) error {
@@ -78,8 +78,8 @@ func turnLights(oper string, start string, end string) {
 	case "on":
 		for x := startx; x <= endx; x++ {
 			for y := starty; y <= endy; y++ {
-				grid[x][y] = true
-				log.Debugf("%d,%d set to %t", x, y, grid[x][y])
+				grid[x][y]--
+				log.Debugf("%d,%d set to %d", x, y, grid[x][y])
 			}
 
 		}
@@ -87,8 +87,10 @@ func turnLights(oper string, start string, end string) {
 	case "off":
 		for x := startx; x <= endx; x++ {
 			for y := starty; y <= endy; y++ {
-				grid[x][y] = false
-				log.Debugf("%d,%d set to %t", x, y, grid[x][y])
+				if grid[x][y] > 0 {
+					grid[x][y]--
+				}
+				log.Debugf("%d,%d set to %d", x, y, grid[x][y])
 			}
 
 		}
@@ -96,22 +98,20 @@ func turnLights(oper string, start string, end string) {
 	case "toggle":
 		for x := startx; x <= endx; x++ {
 			for y := starty; y <= endy; y++ {
-				grid[x][y] = !grid[x][y]
-				log.Debugf("%d,%d set to %t", x, y, grid[x][y])
+				grid[x][y] += 2
+				log.Debugf("%d,%d set to %d", x, y, grid[x][y])
 			}
 
 		}
 	}
 }
 
-func countLights(l [][]bool) int {
-	count := 0
-	for i := range l {
-		for j := range l[i] {
-			if l[i][j] {
-				count++
-			}
+func countBrightness(l [][]int) int {
+	brightness := 0
+	for x := range l {
+		for y := range l[x] {
+			brightness += l[x][y]
 		}
 	}
-	return count
+	return brightness
 }
