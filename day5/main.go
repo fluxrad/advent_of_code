@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
@@ -25,13 +25,19 @@ func main() {
 	scanner.Split(bufio.ScanWords)
 
 	niceWordCount := 0
+	niceWordCount2 := 0
 	for scanner.Scan() {
 		if WordIsNice(scanner.Text()) {
 			niceWordCount++
 		}
+
+		if WordIsNice2(scanner.Text()) {
+			niceWordCount2++
+		}
 	}
 
-	fmt.Printf("%d words are nice", niceWordCount)
+	fmt.Printf("%d words are nice in part one\n", niceWordCount)
+	fmt.Printf("%d words are nice in part two\n", niceWordCount2)
 }
 
 func WordIsNice(str string) bool {
@@ -66,5 +72,38 @@ func WordIsNice(str string) bool {
 		return true
 	}
 
+	return false
+}
+
+func WordIsNice2(str string) bool {
+	log.Debugf("word is %s", str)
+	repeats := false
+	doubles := false
+
+	for i, c := range strings.Split(str, "") {
+		if i < len(str)-2 && c == string(str[i+2]) {
+			repeats = true
+		}
+
+		if i >= len(str)-3 {
+			continue
+		}
+
+		search := c + string(str[i+1])
+		matched, err := regexp.MatchString(search, string(str[i+2:]))
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Debugf("search string is:%s, match result is: %t", search, matched)
+
+		if matched {
+			doubles = true
+		}
+
+	}
+
+	if repeats && doubles {
+		return true
+	}
 	return false
 }
