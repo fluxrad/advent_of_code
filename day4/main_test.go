@@ -12,7 +12,7 @@ func init() {
 
 func TestFindMD5(t *testing.T) {
 	seed := "abcdef"
-	result, err := FindMD5(seed)
+	result, err := FindMD5(seed, "00000")
 
 	if err != nil {
 		t.Error("Got error ", err)
