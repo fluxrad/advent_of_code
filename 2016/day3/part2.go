@@ -26,37 +26,36 @@ func main() {
 	r := regexp.MustCompile("[0-9]+")
 
 	possibleTriangles := 0
+	candidates := [][]int{}
 
 	scanner := bufio.NewScanner(input)
 
-	trs := [][]int{}
 	for scanner.Scan() {
-
 		for i, v := range r.FindAllString(scanner.Text(), -1) {
 			s, err := strconv.Atoi(v)
 			if err != nil {
 				log.Fatal("wtf")
 			}
 
-			// New batch of triangles
-			if len(trs) < 3 {
-				trs = append(trs, []int{s})
+			// New batch of candidates
+			if len(candidates) < 3 {
+				candidates = append(candidates, []int{s})
 			} else {
-				trs[i] = append(trs[i], s)
+				candidates[i] = append(candidates[i], s)
 			}
 		}
 
-		// Are all three triangles fully populated?
-		if len(trs) == 3 && len(trs[2]) == 3 {
-			for _, triangle := range trs {
-				sort.Ints(triangle)
-				if triangle[0]+triangle[1] > triangle[2] {
+		// Are all three candidates fully populated?
+		if len(candidates) == 3 && len(candidates[2]) == 3 {
+			for _, candidate := range candidates {
+				sort.Ints(candidate)
+				if candidate[0]+candidate[1] > candidate[2] {
 					possibleTriangles++
 				}
 			}
 
 			// Start over
-			trs = trs[:0]
+			candidates = candidates[:0]
 		}
 	}
 
