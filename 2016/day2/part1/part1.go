@@ -1,4 +1,4 @@
-package main
+package part1
 
 import (
 	"bufio"
@@ -21,7 +21,7 @@ func init() {
 	log.SetLevel(log.InfoLevel)
 }
 
-func main() {
+func Run() {
 	input, err := os.Open("input")
 	if err != nil {
 		log.Fatal(err)
