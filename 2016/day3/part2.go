@@ -1,4 +1,4 @@
-package part1
+package main
 
 import (
 	"bufio"
@@ -8,7 +8,12 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func Run() {
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+}
+
+func main() {
 	input, err := os.Open("input")
 	if err != nil {
 		log.Fatal(err)
