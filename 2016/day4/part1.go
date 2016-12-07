@@ -27,6 +27,7 @@ func (p PairList) Less(i, j int) bool {
 	} else if p[i].Value > p[j].Value {
 		return false
 	} else {
+		// if counts are equal, sort by letter (ascending)
 		return p[i].Key > p[j].Key
 	}
 }
