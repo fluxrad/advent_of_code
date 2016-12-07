@@ -12,6 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// To sort by value rather than key, we have to create a sortable object type
 type Pair struct {
 	Key   string
 	Value int
@@ -51,7 +52,6 @@ func sortMapByValue(m map[string]int) PairList {
 
 func validateRoom(room, checksum string) bool {
 	freq := make(map[string]int)
-
 	// get rid of dashes and populate frequency
 	re := regexp.MustCompile(`-`)
 	room = re.ReplaceAllLiteralString(room, "")
@@ -63,12 +63,10 @@ func validateRoom(room, checksum string) bool {
 		"frequencies": freq,
 	}).Debug()
 
-	var ck bytes.Buffer
-
 	letterList := sortMapByValue(freq)
-
 	log.Debug(letterList)
 
+	var ck bytes.Buffer
 	for i := 0; i < 5; i++ {
 		ck.WriteString(letterList[i].Key)
 	}
@@ -82,7 +80,6 @@ func validateRoom(room, checksum string) bool {
 	if ck.String() == checksum {
 		return true
 	}
-
 	return false
 }
 
@@ -98,10 +95,9 @@ func main() {
 	}
 
 	r := regexp.MustCompile(`(.+)-([0-9]+)\[([a-z]+)\]\s*`)
-
 	sectorIDSum := 0
-
 	scanner := bufio.NewScanner(input)
+
 	for scanner.Scan() {
 		roomDetail := r.FindStringSubmatch(scanner.Text())
 
