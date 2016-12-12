@@ -23,18 +23,21 @@ func startsWithZeroes(s string) bool {
 		}
 	}
 
-	log.WithFields(log.Fields{
-		"hash": s,
-	}).Debug("found hash")
+	/*
+		log.WithFields(log.Fields{
+			"hash": s,
+		}).Debug("found hash")
+	*/
 
 	return true
 }
 
 func findPassword(id string) string {
-	var password bytes.Buffer
+	password := make([]byte, 8, 8)
+	found := 0
 
 	// The bug is here
-	for i := 0; password.Len() < 8; i++ {
+	for i := 0; found < 8; i++ {
 		var test bytes.Buffer
 
 		test.WriteString(id)
@@ -42,13 +45,23 @@ func findPassword(id string) string {
 
 		sum := fmt.Sprintf("%x", md5.Sum(test.Bytes()))
 
+		// This block is gross. I feel shame.
 		if startsWithZeroes(sum) {
-			password.WriteByte(sum[5])
-			log.Debug(fmt.Sprintf("%s", test.String()))
+			// Only fill the password slot if:
+			//   - we have found a valid slot
+			//   - that slot hasn't already been filled
+			if v, err := strconv.Atoi(string(sum[5])); err == nil && v < 8 {
+				log.Debugf("Using %s", sum)
+
+				if password[int(v)] == 0 {
+					password[int(v)] = sum[6]
+					found++
+				}
+			}
 		}
 	}
 
-	return password.String()
+	return string(password)
 }
 
 func main() {
