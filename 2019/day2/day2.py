@@ -10,17 +10,16 @@ commands[1] = 12
 commands[2] = 2
 
 for x in range(0, len(commands), 4):
-    print(f'Work
     cmd = commands[x]
     if cmd == 99:
         break
 
     loc = commands[x+3]
     if cmd == 1:
-        commands[loc] = commands[x+1] + commands[x+2]
+        commands[loc] = commands[commands[x+1]] + commands[commands[x+2]]
         continue
     elif cmd == 2:
-        commands[loc] = commands[x+1] * commands[x+2]
+        commands[loc] = commands[commands[x+1]] * commands[commands[x+2]]
         continue
 
-print(f'The value of position 0 is {commands[0]}')
+print('The value of position 0 is', commands[0])
