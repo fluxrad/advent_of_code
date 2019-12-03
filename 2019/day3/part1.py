@@ -61,7 +61,7 @@ def place_wire2(grid, wire, cross_coords):
 # Main
 
 
-with open('input', 'r') as f:
+with open('input.example', 'r') as f:
     wires = f.read().splitlines()
 
 wire1 = wires[0].split(',')
@@ -69,7 +69,7 @@ wire2 = wires[1].split(',')
 
 # TODO: figure out how to know what the appropriate size grid is based on the
 # wires.
-grid = np.zeros((100000, 100000), int)
+grid = np.zeros((1000000, 1000000), int)
 
 cross_coords = []
 grid = place_wire1(grid, wire1)
