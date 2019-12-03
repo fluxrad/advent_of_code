@@ -28,8 +28,8 @@ def place_wire1(grid, wire):
 
     return grid
 
-
-def place_wire2(grid, wire, cross_coords):
+def place_wire2(grid, wire):
+    cross_coords = []
     posX, posY = 0, 0
 
     for i in wire:
@@ -61,7 +61,7 @@ def place_wire2(grid, wire, cross_coords):
 # Main
 
 
-with open('input.example', 'r') as f:
+with open('input', 'r') as f:
     wires = f.read().splitlines()
 
 wire1 = wires[0].split(',')
@@ -73,13 +73,14 @@ grid = np.zeros((1000000, 1000000), int)
 
 cross_coords = []
 grid = place_wire1(grid, wire1)
-grid, cross_coords = place_wire2(grid, wire2, cross_coords)
+grid, cross_coords = place_wire2(grid, wire2)
 
 print(cross_coords)
 
 min_distance = abs(cross_coords[0][0]) + abs(cross_coords[0][1])
 for c in cross_coords:
+    print(c)
     distance = abs(c[0]) + abs(c[1])
-    min_distance = distance if distance < distance else min_distance
+    min_distance = distance if distance < min_distance else min_distance
 
 print(f'The answer is {min_distance}')
