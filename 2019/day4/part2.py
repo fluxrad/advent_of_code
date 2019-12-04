@@ -2,10 +2,18 @@
 
 def has_double(num):
     prev = -1
+    count = 1
     for i in num:
         if int(i) == prev:
-            return True
+            count += 1
+        else:
+            if count == 2:
+                return True
+            count = 1
         prev = int(i)
+
+    if count == 2:
+        return True
     return False
 
 
@@ -25,6 +33,10 @@ count = 0
 for i in range(upper - lower):
     candidate = str(lower + i)
     if has_double(candidate) and not decreases(candidate):
+        print(f'{candidate} is okay')
         count += 1
+    else:
+        if not decreases(candidate):
+            print(f'{candidate} does not decrease but is not okay')
 
 print(f'The answer is: {count}')
