@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import sys
-
 DEBUG = True
 
 
@@ -13,9 +11,6 @@ def parse_opcode(opcode):
     ops = list(map(int, f'{opcode:05}'))
     op = ops[3] * 10 + ops[4] * 1
     mode_map = ops[:3]
-
-    print(f'opcode is: {opcode}')
-    print(f'parsed opcode to: {op} and {mode_map}')
     return op, mode_map
 
 
@@ -30,53 +25,54 @@ def deref(memory, loc, *mode_map):
 
 
 def add(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+3]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     memory[memory[loc + 3]] = x + y
     return loc + 4
 
 
 def multiply(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+3]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     memory[memory[loc + 3]] = x * y
     return loc + 4
 
 
 def save(memory, loc, le_input):
+    print(f'memory is {memory[loc:loc+1]}')
     memory[memory[loc + 1]] = le_input
     return loc + 2
 
 
-def output(memory, loc):
+def output(memory, loc, *args):
     print(f'Test results: {memory[memory[loc + 1]]}')
     return loc + 2
 
 
 def jump_if_true(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+2]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     return y if x != 0 else loc + 3
 
 
 def jump_if_false(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+2]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     return y if x == 0 else loc + 3
 
 
 def less_than(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+4]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     memory[memory[loc + 3]] = 1 if x < y else 0
     return loc + 4
 
 
 def equals(memory, loc, *mode_map):
+    debug(f'memory is {memory[loc:loc+4]}')
     x, y = deref(memory, loc, mode_map[0], mode_map[1])
     memory[memory[loc + 3]] = 1 if x == y else 0
     return loc + 4
-
-
-def halt():
-    sys.exit(0)
-
-
 
 
 ### BEGIN MAIN ###
@@ -88,14 +84,13 @@ opcode_map = {
     5: jump_if_true,
     6: jump_if_false,
     7: less_than,
-    8: equals,
-    99: halt
+    8: equals
 }
 
 
-with open('input', 'r') as f:
-    memory = list(map(int, f.read().split(',')))
-
+# with open('input', 'r') as f:
+#     memory = list(map(int, f.read().split(',')))
+memory = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
 system_id = int(input("Please enter the system ID: "))
 
 halt = False
@@ -104,7 +99,7 @@ while not halt:
     opcode = memory[loc]
     op, mode_map = parse_opcode(opcode)
 
-    print(f'op is {op}. mode_map is {mode_map}')
+    # debug(f'opcode = {opcode}, op = {op}, mode_map = {mode_map}, loc = {loc}')
 
     if op == 99:
         halt = True
